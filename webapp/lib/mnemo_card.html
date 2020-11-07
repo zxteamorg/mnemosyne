@@ -1,0 +1,39 @@
+<section>
+	<div class="mdc-card mdc-card--outlined demo-size">
+		<div class="mdc-card__media mdc-card__media--16-9 demo-card__media" [style]="mediaStyle"></div>
+		<div class="demo-card__primary">
+			<h2 *ngIf="hasCommonAttribute" class="demo-card__title">{{commonAttribute.name}}</h2>
+			<h3 class="demo-card__subtitle">{{mime}}</h3>
+		</div>
+		<div class="demo-card__secondary">
+			<material-chips>
+				<material-chip emphasis *ngFor="let tag of intersectTags" [removable]="false"
+					[value]="tag" displayNameRenderer>
+				</material-chip>
+				<material-chip emphasis class="exclusive-tag" *ngFor="let tag of exclusiveTags" [removable]="false"
+					[value]="tag" displayNameRenderer>
+				</material-chip>
+				<material-chip class="unused-tag" *ngFor="let tag of unusedTags" [removable]="false"
+					[value]="tag" displayNameRenderer>
+				</material-chip>
+			</material-chips>
+		</div>
+		<div class="mdc-card__actions">
+			<div class="mdc-card__action-buttons">
+				<material-button>Stub1</material-button>
+				<material-button>Stub2</material-button>
+			</div>
+			<div class="mdc-card__action-icons">
+				<material-button icon>
+					<material-icon icon="favorite_border"></material-icon>
+				</material-button>
+				<material-button icon>
+					<material-icon icon="share"></material-icon>
+				</material-button>
+				<material-button icon>
+					<material-icon icon="more_vert"></material-icon>
+				</material-button>
+			</div>
+		</div>
+	</div>
+</section>
