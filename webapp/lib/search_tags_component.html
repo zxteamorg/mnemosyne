@@ -1,0 +1,5 @@
+<material-chips class="clickable">
+	<material-chip emphasis *ngFor="let tag of searchTags" [removable]="false" [value]="tag" buttonDecorator
+		(trigger)="onClick(tag)" displayNameRenderer>
+	</material-chip>
+</material-chips>

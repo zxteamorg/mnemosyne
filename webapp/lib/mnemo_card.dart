@@ -1,8 +1,9 @@
+import "dart:async";
+
 import "package:angular/angular.dart" show Component, Input, coreDirectives;
 import "package:angular/security.dart" show DomSanitizationService, SafeStyle;
 import "package:angular_components/angular_components.dart"
     show
-        HasUIDisplayName,
         MaterialButtonComponent,
         MaterialChipComponent,
         MaterialChipsComponent,
@@ -19,6 +20,9 @@ import "package:angular_components/material_chips/material_chips.dart"
 
 import "mnemo.dart" show Mnemo;
 import "mnemo_attribute.dart";
+import "mnemo_service.dart" show MnemoService;
+import "tag_chip.dart" show TagChip;
+//import "search_tags_provider.dart" show SearchTagsProvider;
 
 @Component(
   selector: "mnemo-card",
@@ -38,9 +42,16 @@ import "mnemo_attribute.dart";
 )
 class MnemoCardComponent {
   Mnemo _mnemo;
-  DomSanitizationService _sanitizer;
+  // SearchTagsProvider _searchTagsProvider;
+  final DomSanitizationService _sanitizer;
+  final MnemoService _mnemoService;
 
-  MnemoCardComponent(this._sanitizer);
+  MnemoCardComponent(this._sanitizer, this._mnemoService) {
+    // Timer.periodic(Duration(seconds: 5), (_) {
+    //   final String nowIsoStr = DateTime.now().toIso8601String();
+    //   this._ownTags.add((nowIsoStr));
+    // });
+  }
 
   Mnemo get mnemo {
     if (this._mnemo == null) {
@@ -65,35 +76,30 @@ class MnemoCardComponent {
   UnixFileAttribute get unixFileAttribute =>
       this.mnemo.getAttribute<UnixFileAttribute>();
 
-  Iterable<TagChip> get ownTags => List.from([
-        TagChip('science'),
-        TagChip('math'),
-        TagChip('wizardry'),
-        TagChip('technology'),
-        TagChip('engineering')
-      ]);
-  Iterable<TagChip> get searchTags => List.from([
-        TagChip('science'),
-        TagChip('math'),
-        TagChip('wizardry'),
-        TagChip('2015'),
-        TagChip('2018'),
-        TagChip('children')
-      ]);
+  List<String> _ownTags = List.from(
+      [("science"), ("math"), ("wizardry"), ("technology"), ("engineering")],
+      growable: true);
 
-  Iterable<TagChip> get intersectTags =>
-      this.searchTags.where((searchTag) => this
-          .ownTags
-          .where((ownTag) => ownTag.uiDisplayName == searchTag.uiDisplayName)
-          .isNotEmpty);
-  Iterable<TagChip> get exclusiveTags => this.ownTags.where((ownTag) => this
+  Iterable<TagChip> get intersectTags => this
+      ._mnemoService
       .searchTags
-      .where((searchTag) => ownTag.uiDisplayName == searchTag.uiDisplayName)
-      .isEmpty);
-  Iterable<TagChip> get unusedTags => this.searchTags.where((searchTag) => this
-      .ownTags
-      .where((ownTag) => ownTag.uiDisplayName == searchTag.uiDisplayName)
-      .isEmpty);
+      .where((searchTag) =>
+          this._ownTags.where((ownTag) => ownTag == searchTag).isNotEmpty)
+      .map((tag) => TagChip(tag));
+  Iterable<TagChip> get exclusiveTags => this
+      ._ownTags
+      .where((ownTag) => this
+          ._mnemoService
+          .searchTags
+          .where((searchTag) => ownTag == searchTag)
+          .isEmpty)
+      .map((tag) => TagChip(tag));
+  Iterable<TagChip> get unusedTags => this
+      ._mnemoService
+      .searchTags
+      .where((searchTag) =>
+          this._ownTags.where((ownTag) => ownTag == searchTag).isEmpty)
+      .map((tag) => TagChip(tag));
 
   bool get hasCommonAttribute =>
       this.mnemo.findAttribute<CommonAttribute>() != null;
@@ -119,15 +125,5 @@ class MnemoCardComponent {
         this._sanitizer.bypassSecurityTrustStyle(style);
 
     return trustedStyle;
-  }
-}
-
-class TagChip implements Comparable<TagChip>, HasUIDisplayName {
-  @override
-  final String uiDisplayName;
-  const TagChip(this.uiDisplayName);
-
-  int compareTo(TagChip other) {
-    return this.uiDisplayName.compareTo(other.uiDisplayName);
   }
 }

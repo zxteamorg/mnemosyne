@@ -6,16 +6,28 @@ import "package:http/http.dart";
 import "mnemo.dart";
 
 class MnemoService {
-  //static final _headers = {'Content-Type': 'application/json'};
-  static const _auditUrl = "http://localhost:5000/audit"; // URL to web API
+  final List<String> _searchTags = List.from(
+      [("science"), ("math"), ("wizardry"), ("2015"), ("2018"), ("children")],
+      growable: true);
+  static final _headers = {"Content-Type": "application/json"};
+  static const _apiUrl = "http://localhost:5000/audit"; // URL to web API
   final Client _http;
 
-  MnemoService(this._http);
+  MnemoService(this._http) {
+    print("Construct '${(MnemoService).toString()}' instance");
+    Timer.periodic(Duration(seconds: 5), (_) {
+      final String nowIsoStr = DateTime.now().toIso8601String();
+      this._searchTags.add("st-$nowIsoStr");
+      print(this._searchTags.length);
+    });
+  }
+
+  Iterable<String> get searchTags => this._searchTags;
 
   Future<List<Object>> list() async {
     try {
-      final response = await _http.get(_auditUrl);
-      final mnemos = (_extractData(response) as List)
+      final Response response = await _http.get(MnemoService._apiUrl, headers: MnemoService._headers);
+      final List<Mnemo> mnemos = (_extractData(response) as List)
           .map((value) => Mnemo.fromJson(value))
           .toList();
 
@@ -27,7 +39,7 @@ class MnemoService {
 
   // Future<Mnemo> fetchById(final String auditId) async {
   //   try {
-  //     final response = await _http.get(_auditUrl);
+  //     final response = await _http.get(_apiUrl);
   //     final audit = Mnemo.fromJson(_extractData(response));
 
   //     return audit;

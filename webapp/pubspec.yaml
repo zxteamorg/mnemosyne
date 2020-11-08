@@ -1,5 +1,5 @@
 name: zxteamorg_mnemosyne
-description: CryptoPay's Dashboard Audit web app that uses AngularDart
+description: Mnemosyne Web Application that uses AngularDart
 version: 0.0.1
 
 environment:

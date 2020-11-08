@@ -1,0 +1,6 @@
+@import 'package:angular_components/css/material/material';
+@import 'package:angular_components/material_chips/mixins';
+
+.clickable {
+	@include material-chips-clickable();
+}

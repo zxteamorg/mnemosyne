@@ -1,16 +1,15 @@
-import "dart:async";
-import "dart:convert";
+import "dart:async" show Future;
+import "dart:convert" show JsonUnsupportedObjectError;
 
-import "package:angular/angular.dart";
+import "package:angular/angular.dart" show Component, OnInit, coreDirectives;
 
-import "mnemo.dart";
-import "mnemo_card.dart";
-import "mnemo_service.dart";
+import "mnemo.dart" show Mnemo;
+import "mnemo_card.dart" show MnemoCardComponent;
+import "mnemo_service.dart" show MnemoService;
 
 @Component(
   selector: "mnemo-list",
   templateUrl: "mnemo_list_component.html",
-  providers: [MnemoService],
   styles: [".error {color:red;}"],
   directives: [coreDirectives, MnemoCardComponent],
 )
@@ -37,15 +36,4 @@ class MnemoListComponent implements OnInit {
       }
     }
   }
-
-  // Future<void> add(final String auditId) async {
-  //   assert(auditId != null);
-  //   assert(!auditId.isEmpty);
-
-  //   try {
-  //     auditEntries.add(await _auditService.fetchById(auditId));
-  //   } catch (e) {
-  //     errorMessage = e.toString();
-  //   }
-  // }
 }

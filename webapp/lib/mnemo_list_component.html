@@ -2,7 +2,7 @@
 
 <ul *ngIf="entries != null" style="list-style-type:none;">
 	<li *ngFor="let entry of entries" style="display: inline-block; margin: 1em;">
-		<mnemo-card id="{{entry.id}}" [mnemo]="entry"></mnemo-card>
+		<mnemo-card [mnemo]="entry"></mnemo-card>
 	</li>
 </ul>
 
