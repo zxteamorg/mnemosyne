@@ -36,6 +36,7 @@ $mdc-card-image: 'http://material-components-web.appspot.com/images/16-9.jpg';
 // Use the same image as the mdc-web example.
 .demo-card__media {
   background-image: url($mdc-card-image);
+  background-size: 128px;
 }
 
 .demo-card__primary {

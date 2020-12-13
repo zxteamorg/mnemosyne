@@ -1,0 +1,23 @@
+# https://github.com/dart-lang/build/blob/7002c666513db0fa29756b6ed39c048732b04297/docs/faq.md
+# https://github.com/dart-lang/build/tree/7002c666513db0fa29756b6ed39c048732b04297/build_web_compilers
+
+global_options:
+  build_web_compilers:ddc:
+    options:
+      environment:
+        BUILD_DEVEL: true
+        API_ORIGIN: stub://
+        # API_ORIGIN: http://127.0.0.1:5000
+        # API_ORIGIN: https://mnemosyne.zxteam.org
+
+targets:
+  $default:
+    builders:
+      angular_components|scss_builder:
+        enabled: true
+      build_web_compilers:entrypoint:
+        # These are globs for the entrypoints you want to compile.
+        generate_for:
+          - web/main.devel.dart
+        options:
+          compiler: dartdevc

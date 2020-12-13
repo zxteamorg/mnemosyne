@@ -1,0 +1,17 @@
+<div class="container-fluid">
+	<div class="row" style="background-color: lightgray;">
+		<div class="col-1 col-md-1 col-xl-1 vcenter-container">
+			<span>TAGS:</span>
+		</div>
+		<div class="col-8 col-md-9 col-xl-10">
+			<material-chips class="clickable">
+				<material-chip *ngFor="let tag of tags" [attr.emphasis]="tag.chipEmphasis" [removable]="false"
+					[value]="tag" (trigger)="onClick(tag)" buttonDecorator displayNameRenderer>
+				</material-chip>
+			</material-chips>
+		</div>
+		<div class="col-3 col-md-2 col-xl-1 vcenter-container">
+			<material-button class="search-button" (trigger)="searchButtonClick" [disabled]="!isSearchButtonEnabled">Search</material-button>
+		</div>
+	</div>
+</div>

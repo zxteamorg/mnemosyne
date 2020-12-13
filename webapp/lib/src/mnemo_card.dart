@@ -1,5 +1,3 @@
-import "dart:async";
-
 import "package:angular/angular.dart" show Component, Input, coreDirectives;
 import "package:angular/security.dart" show DomSanitizationService, SafeStyle;
 import "package:angular_components/angular_components.dart"
@@ -18,18 +16,24 @@ import "package:angular_components/material_chips/material_chip.dart"
 import "package:angular_components/material_chips/material_chips.dart"
     show MaterialChipsComponent;
 
-import "mnemo.dart" show Mnemo;
-import "mnemo_attribute.dart";
-import "mnemo_service.dart" show MnemoService;
+import "../models/models.dart"
+    show
+        CommonAttribute,
+        MnemoEntry,
+        TagEntry,
+        ThumbnailAttribute,
+        UnixFileAttribute;
+
+import "application_state.dart" show ApplicationState;
+import "search_tags_state.dart" show SearchTagsState;
 import "tag_chip.dart" show TagChip;
-//import "search_tags_provider.dart" show SearchTagsProvider;
 
 @Component(
   selector: "mnemo-card",
   templateUrl: "mnemo_card.html",
   styleUrls: [
     "package:angular_components/css/mdc_web/card/mdc-card.scss.css",
-    "mnemo_card.css"
+    "mnemo_card.scss.css"
   ],
   directives: [
     coreDirectives,
@@ -41,19 +45,22 @@ import "tag_chip.dart" show TagChip;
   ],
 )
 class MnemoCardComponent {
-  Mnemo _mnemo;
+  MnemoEntry _mnemo;
   // SearchTagsProvider _searchTagsProvider;
   final DomSanitizationService _sanitizer;
-  final MnemoService _mnemoService;
+  //final MnemoService _mnemoService;
+  final ApplicationState _applicationState;
+  final SearchTagsState _searchTagsState;
 
-  MnemoCardComponent(this._sanitizer, this._mnemoService) {
+  MnemoCardComponent(
+      this._sanitizer, this._applicationState, this._searchTagsState) {
     // Timer.periodic(Duration(seconds: 5), (_) {
     //   final String nowIsoStr = DateTime.now().toIso8601String();
     //   this._ownTags.add((nowIsoStr));
     // });
   }
 
-  Mnemo get mnemo {
+  MnemoEntry get mnemo {
     if (this._mnemo == null) {
       throw StateError(
           "An input 'mnemo' is not attached to the component '${(MnemoCardComponent).toString()}'");
@@ -62,7 +69,7 @@ class MnemoCardComponent {
   }
 
   @Input()
-  void set mnemo(Mnemo value) {
+  void set mnemo(MnemoEntry value) {
     this._mnemo = value;
   }
 
@@ -76,30 +83,66 @@ class MnemoCardComponent {
   UnixFileAttribute get unixFileAttribute =>
       this.mnemo.getAttribute<UnixFileAttribute>();
 
-  List<String> _ownTags = List.from(
-      [("science"), ("math"), ("wizardry"), ("technology"), ("engineering")],
-      growable: true);
+  List<TagEntry> get _ownTags {
+    final List<TagEntry> entries = this
+        ._applicationState
+        .availableTags
+        .where((tag) => this
+            ._mnemo
+            .tags
+            .where((boundTag) => boundTag.tagId == tag.id)
+            .isNotEmpty)
+        // .where((element) => [
+        //       ("science"),
+        //       ("math"),
+        //       ("wizardry"),
+        //       ("technology"),
+        //       ("test"),
+        //       ("engineering")
+        //     ].contains(element.name))
+        .toList();
+    // print(this._applicationState.availableTags);
+    //print(entries.length);
+    return entries;
+  }
 
+  /**
+   * Теги которые есть в поиске и имеются в наличии у Mnemo
+   */
   Iterable<TagChip> get intersectTags => this
-      ._mnemoService
+      ._searchTagsState
       .searchTags
       .where((searchTag) =>
           this._ownTags.where((ownTag) => ownTag == searchTag).isNotEmpty)
-      .map((tag) => TagChip(tag));
+      .map((tag) => TagChip(tag))
+      .toList()
+        ..sort();
+
+  /**
+   * Теги имеются в наличии у Mnemo но нет в поиске
+   */
   Iterable<TagChip> get exclusiveTags => this
       ._ownTags
       .where((ownTag) => this
-          ._mnemoService
+          ._searchTagsState
           .searchTags
           .where((searchTag) => ownTag == searchTag)
           .isEmpty)
-      .map((tag) => TagChip(tag));
+      .map((tag) => TagChip(tag))
+      .toList()
+        ..sort();
+
+  /**
+   * Теги которые есть в поиске и но НЕ имеются в наличии у Mnemo
+   */
   Iterable<TagChip> get unusedTags => this
-      ._mnemoService
+      ._searchTagsState
       .searchTags
       .where((searchTag) =>
           this._ownTags.where((ownTag) => ownTag == searchTag).isEmpty)
-      .map((tag) => TagChip(tag));
+      .map((tag) => TagChip(tag))
+      .toList()
+        ..sort();
 
   bool get hasCommonAttribute =>
       this.mnemo.findAttribute<CommonAttribute>() != null;

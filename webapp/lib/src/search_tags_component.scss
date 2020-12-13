@@ -1,0 +1,16 @@
+@import "package:angular_components/css/material/material";
+@import "package:angular_components/material_chips/mixins";
+
+.clickable {
+	@include material-chips-clickable();
+}
+
+.vcenter-container {
+	display: flex;
+	align-items: center;
+}
+
+.search-button {
+	position: absolute;
+	right: 0;
+}
